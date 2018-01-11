@@ -23,10 +23,12 @@ class ThreadedServer(object):
         while True:
             try:
                 data = client.recv(size)
+                print("data: " + data)
                 if data:
-                    res = ReqResHandler.ReqRes(data)
+                    res = ReqResHandler.ReqRes((str(data))).process_req(str(data))
                     # Set the response to echo back the recieved data
                     response = res
+                    print ("res: " + response)
                     client.send(response)
                 else:
                     raise error('Client disconnected')
