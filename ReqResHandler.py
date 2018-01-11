@@ -23,7 +23,11 @@ class ReqRes(object):
         exec funcName
 
     def handleClass(self, req_data):
-        return "class"
+        classWordRemove = re.search("class", str(req_data))
+        colons = re.search(":", str(req_data))
+        className = req_data[classWordRemove.end() + 1:colons.start()]
+        dir(className)
+        return className
 
     def process_req(self, req_data):
         if re.search("class", str(req_data)) is not None:
@@ -36,24 +40,26 @@ class ReqRes(object):
             return self.handleMathExpr(str(req_data))
 
 
-# def main():
-#     print(ReqRes("Misha").process_req("2+2"))
-    # ReqResString = ReqRes('"misha"')
-    # ReqResMath = ReqRes('5+5')
-    # ReqResFun = ReqRes('def Misha(): print("Misha Function")')
-    # ReqResPrint = ReqRes('print("Michael")')
-    #
-    # print(ReqResString.handleMathExpr('"misha"'))
-    #
-    # print(ReqResMath.handleMathExpr('5+5'))
-    #
-    # ReqResFun.handleFunction('def Misha(): print("Misha Function")')
-    # print(ReqResFun.handleFunction('def MishaMath(): return (2+2)'))
-    #
-    # print(ReqResPrint.handlePrint('print("Michael")'))
-    #
-    # print(ReqResMath.handleMathExpr('25*4'))
+def main():
+    print(ReqRes("Misha").process_req("2+2"))
+    ReqResString = ReqRes('"misha"')
+    ReqResMath = ReqRes('5+5')
+    ReqResFun = ReqRes('def Misha(): print("Misha Function")')
+    ReqResPrint = ReqRes('print("Michael")')
+    ReqResClass = ReqRes('class').process_req(
+        "class Misha(): name = 'Misha' lastname = 'Ovodenko' age = 24 def eat(): print('I am Eating now')")
+    print("ReqResClass: " + ReqResClass)
+    print(ReqResString.handleMathExpr('"misha"'))
+
+    print(ReqResMath.handleMathExpr('5+5'))
+
+    ReqResFun.handleFunction('def Misha(): print("Misha Function")')
+    print(ReqResFun.handleFunction('def MishaMath(): return (2+2)'))
+
+    print(ReqResPrint.handlePrint('print("Michael")'))
+
+    print(ReqResMath.handleMathExpr('25*4'))
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
