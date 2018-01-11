@@ -3,12 +3,6 @@ import subprocess
 
 
 class ReqRes(object):
-    dict = {
-        'print': 'print',
-        'function': 'def',
-        'class': 'class',
-        'MathExp': 'eval'
-    }
 
     def __init__(self, data):
         self.data = data
