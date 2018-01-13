@@ -6,59 +6,59 @@ class ReqRes(object):
 
     def __init__(self, data):
         self.data = data
-
-    def handleMathExpr(self, req_data):
-        result = eval(str(req_data))
+    
+    def handle_math_string_exp(self):
+        result = eval(str(self.data))
         return str(result)
 
-    def handlePrint(self, req_data):
-        printS = re.search("print", str(req_data))
-        return req_data[:printS.start()] + req_data[printS.end():]
+    def handle_print(self):
+        print_exp = re.search("print", str(self.data))
+        return self.data[:print_exp.start()] + self.data[print_exp.end():]
 
-    def handleFunction(self, req_data):
-        colons = re.search(":", str(req_data))
-        defex = re.search("def", str(req_data))
-        funcName = req_data[defex.end() + 1:colons.start()]
-        exec req_data
-        exec funcName
+    def handle_function(self):
+        colons = re.search(":", str(self.data))
+        def_exp = re.search("def", str(self.data))
+        func_name = self.data[def_exp.end() + 1:colons.start()]
+        exec self.data
+        exec func_name
 
-    def handleClass(self, req_data):
-        classWordRemove = re.search("class", str(req_data))
-        colons = re.search(":", str(req_data))
-        className = req_data[classWordRemove.end() + 1:colons.start()]
-        dir(className)
-        return className
+    def handle_class(self):
+        class_word_remove = re.search("class", str(self.data))
+        colons = re.search(":", str(self.data))
+        class_name = self.data[class_word_remove.end() + 1:colons.start()]
+        dynamic_class = type(class_name, (), {"f_name": "Misha"})
+        return dynamic_class
 
-    def process_req(self, req_data):
-        if re.search("class", str(req_data)) is not None:
-            return self.handleClass(str(req_data))
-        elif re.search("def", str(req_data)) is not None:
-            return self.handleFunction(str(req_data))
-        elif re.search("print", str(req_data)) is not None:
-            return self.handlePrint(str(req_data))
+    def handle_class_inner_attr(self):
+        return "m"
+
+    def handle_class_inner_func(self):
+        return "m"
+
+    def process_req(self):
+        if re.search("class", str(self.data)) is not None:
+            return self.handle_class()
+        elif re.search("def", str(self.data)) is not None:
+            return self.handle_function()
+        elif re.search("print", str(self.data)) is not None:
+            return self.handle_print()
         else:
-            return self.handleMathExpr(str(req_data))
+            return self.handle_math_string_exp()
 
 
 def main():
-    print(ReqRes("Misha").process_req("2+2"))
-    ReqResString = ReqRes('"misha"')
-    ReqResMath = ReqRes('5+5')
-    ReqResFun = ReqRes('def Misha(): print("Misha Function")')
-    ReqResPrint = ReqRes('print("Michael")')
-    ReqResClass = ReqRes('class').process_req(
-        "class Misha(): name = 'Misha' lastname = 'Ovodenko' age = 24 def eat(): print('I am Eating now')")
-    print("ReqResClass: " + ReqResClass)
-    print(ReqResString.handleMathExpr('"misha"'))
-
-    print(ReqResMath.handleMathExpr('5+5'))
-
-    ReqResFun.handleFunction('def Misha(): print("Misha Function")')
-    print(ReqResFun.handleFunction('def MishaMath(): return (2+2)'))
-
-    print(ReqResPrint.handlePrint('print("Michael")'))
-
-    print(ReqResMath.handleMathExpr('25*4'))
+    # print (ReqRes('"Misha"').handle_math_string_exp())
+    # print (ReqRes('2+2').handle_math_string_exp())
+    # print (ReqRes('print("Hi, I am Hungry")').handle_print())
+    # print (ReqRes('def Hi(): print("Hi, I am Misha")').handle_function())
+    # print (ReqRes('class Misha(): fName = "Misha"').handle_class())
+    # print (type(ReqRes('class Misha(): def __init__(self): fName = "Misha"').handleClass()))
+    print (ReqRes('"Misha"').process_req())
+    print (ReqRes('2+2').process_req())
+    print (ReqRes('print "Hi, I am Hungry" ').process_req())
+    print (ReqRes('def Hi(): print("Hi, I am Misha")').process_req())
+    print (ReqRes('class Misha(object): fName = "Misha"').process_req())
+    print (ReqRes('class Misha(): fName = "Misha"').process_req().f_name)
 
 
 if __name__ == '__main__':
