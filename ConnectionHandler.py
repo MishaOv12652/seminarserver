@@ -4,6 +4,8 @@ import ReqResHandler
 
 
 class ThreadedServer(object):
+    t_lock = threading.Lock()
+
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -12,7 +14,7 @@ class ThreadedServer(object):
         self.sock.bind((self.host, self.port))
 
     def listen(self):
-        self.sock.listen(5)
+        self.sock.listen(10)
         while True:
             client, address = self.sock.accept()
             client.settimeout(60)
@@ -22,6 +24,7 @@ class ThreadedServer(object):
         size = 1024
         while True:
             try:
+                self.t_lock.acquire()
                 data = client.recv(size)
                 if data:
                     res = ReqResHandler.ReqRes((str(data))).process_req()
@@ -30,9 +33,12 @@ class ThreadedServer(object):
                     print(dir(data))
                     print ("res: " + response)
                     client.send(response)
+                    self.t_lock.release()
                 else:
-                    raise error('Client disconnected')
+                    self.t_lock.acquire()
+                    raise StandardError('Client disconnected')
             except:
+                self.t_lock.acquire()
                 client.close()
                 return False
 
