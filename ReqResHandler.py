@@ -59,12 +59,6 @@ class ReqRes(object):
 
 
 def main():
-    # print (ReqRes('"Misha"').handle_math_string_exp())
-    # print (ReqRes('2+2').handle_math_string_exp())
-    # print (ReqRes('print("Hi, I am Hungry")').handle_print())
-    # print (ReqRes('def Hi(): print("Hi, I am Misha")').handle_function())
-    # print (ReqRes('class Misha(): fName = "Misha"').handle_class())
-    # print (type(ReqRes('class Misha(): def __init__(self): fName = "Misha"').handleClass()))
     print (ReqRes('"Misha"').process_req())
     print (ReqRes('2+2').process_req())
     print (ReqRes('print "Hi, I am Hungry" ').process_req())
