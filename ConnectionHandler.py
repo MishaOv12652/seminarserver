@@ -20,7 +20,7 @@ class ThreadedServer(object):
             client.settimeout(60)
             threading.Thread(target=self.listenToClient, args=(client, address)).start()
 
-    def listenToClient(self, client):
+    def listenToClient(self, client, address):
         size = 1024
         while True:
             try:
@@ -30,7 +30,6 @@ class ThreadedServer(object):
                     res = ReqResHandler.ReqRes((str(data))).process_req()
                     # Set the response to echo back the recieved data
                     response = res
-                    print(dir(data))
                     print ("res: " + response)
                     client.send(response)
                     self.t_lock.release()
