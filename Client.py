@@ -1,22 +1,46 @@
 import socket
 
+import socket
 
-def main():
+
+def Main():
     host = '127.0.0.1'
-    port = 5000
+    port = 5200
 
-    s = socket.socket()
-    s.connect((host, port))
+    mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    mySocket.connect((host, port))
 
-    messege = input("-> ")
-    while messege != 'q':
-        s.send(messege)
-        data = s.recv(1024)
-        print("Recieved from server: " + data)
-        messege = input("-> ")
+    message = input(" ? ")
 
-    s.close()
+    while message != 'q':
+        mySocket.send(message)
+        data = mySocket.recv(1024)
 
+        print ('Received from server: ' + data)
+
+        message = input(" ? ")
+
+
+# mySocket.close()
 
 if __name__ == '__main__':
-    main()
+    Main()
+# def main():
+#     host = '127.0.0.1'
+#     port = 5000
+#
+#     s = socket.socket()
+#     s.connect((host, port))
+#
+#     messege = input("-> ")
+#     while messege != 'q':
+#         s.send(messege)
+#         data = s.recv(1024)
+#         print("Recieved from server: " + data)
+#         messege = input("-> ")
+#
+#     s.close()
+#
+#
+# if __name__ == '__main__':
+#     main()
