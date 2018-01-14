@@ -6,7 +6,7 @@ def main():
     port = 5200
     mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     mySocket.connect((host, port))
-    filepath = './misha'
+    filepath = './cla.txt'  # './misha'
     with open(filepath) as fp:
         line = fp.readline()
         cnt = 1

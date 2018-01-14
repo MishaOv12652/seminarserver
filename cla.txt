@@ -1,0 +1,1 @@
+class Demo(): f_name="Misha" l_name="Ovodenko" def into(): print "Hi, My Name is Misha Ovodenko"
