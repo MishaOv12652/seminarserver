@@ -1,6 +1,8 @@
 import socket
 import threading
 import ReqResHandler
+import EncDycrpt
+import cPickle
 
 
 class ThreadedServer(object):
@@ -15,36 +17,40 @@ class ThreadedServer(object):
 
     def listen(self):
         self.sock.listen(10)
+        print('Server started on port 5200....')
+        print('Waiting For Clients.........')
         while True:
             client, address = self.sock.accept()
-            client.settimeout(60)
-            threading.Thread(target=self.listenToClient, args=(client, address)).start()
+            # client.settimeout(60)
+            # enc_dec_obj = EncDycrpt.EncDec()
+            # enc_dec_obj.create_private_public_key()
+            # pub_key_to_client = enc_dec_obj.priv_pub_keys_dict['bin_pub_key']
+            threading.Thread(target=self.listen_to_client, args=(client, address)).start()
 
-    def listenToClient(self, client, address):
+    def listen_to_client(self, client, address):
+        print("Client Connected......")
         size = 1024
         while True:
             try:
-                self.t_lock.acquire()
+                # self.t_lock.acquire()
                 data = client.recv(size)
                 if data:
-                    res = ReqResHandler.ReqRes((str(data))).process_req()
-                    # Set the response to echo back the recieved data
-                    response = res
-                    print ("res: " + response)
-                    client.send(response)
-                    self.t_lock.release()
+                    response = ReqResHandler.ReqRes((str(data))).process_req()
+                    client.send(str(response))
+                    # self.t_lock.release()
                 else:
-                    self.t_lock.acquire()
+                    # self.t_lock.acquire()
                     raise StandardError('Client disconnected')
-            except:
-                self.t_lock.acquire()
+
+            except StandardError:
+                # self.t_lock.acquire()
                 client.close()
-                return False
+                # return False
 
 
 if __name__ == "__main__":
     while True:
-        port_num = input("Port? ")
+        port_num = 5200  # input("Port? ")
         try:
             port_num = int(port_num)
             break
