@@ -1,0 +1,9 @@
+2+2
+2**6
+print 'Misha'
+def Misha(): print 'Ovodenko'
+def Misha_num(): return 24
+2+2
+2**6
+def Regina(): print 'Regina'
+def Oleg(): print 'Oleg'
