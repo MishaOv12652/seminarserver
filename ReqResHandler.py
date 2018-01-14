@@ -36,10 +36,8 @@ class ReqRes(object):
             else:
                 func_name = self.data[def_exp.end() + 1:colons.start() - num_of_args - 1]
             exec self.data
-            possibles = globals().copy()
-            possibles.update(locals())
             globals().update(locals())
-            method = possibles.get(func_name)
+            method = globals().get(func_name)
             if callable(method):
                 print_search = re.search('print', self.data)
                 if print_search is None:
@@ -56,10 +54,8 @@ class ReqRes(object):
         class_word_remove = re.search("class", str(self.data))
         colons = re.search(":", str(self.data))
         class_name = self.data[class_word_remove.end() + 1:colons.start() - 2]
-        possibles = globals().copy()
-        possibles.update(locals())
         globals().update(locals())
-        clas = possibles.get(class_name)
+        clas = globals().get(class_name)
         dynamic_class = type(class_name, (), {"f_name": "Misha"})
         return dynamic_class
 
