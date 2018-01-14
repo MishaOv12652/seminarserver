@@ -1,4 +1,6 @@
 import re
+import sys
+from StringIO import StringIO
 
 
 class ReqRes(object):
@@ -8,7 +10,6 @@ class ReqRes(object):
 
     def handle_math_string_exp(self):
         result = eval(str(self.data))
-        print(result)
         return str(result)
 
     def handle_print(self):
@@ -27,10 +28,18 @@ class ReqRes(object):
     def handle_function(self):
         colons = re.search(":", str(self.data))
         def_exp = re.search("def", str(self.data))
-        func_name = self.data[def_exp.end() + 1:colons.start()]
-        exec str(self.data)
-        if eval(str(func_name)) is not None:
-            return eval(str(func_name))
+        num_of_args = self.handle_num_args()
+        func_name = self.data[def_exp.end() + 1:colons.start() - num_of_args - 1]
+        exec self.data
+        possibles = globals().copy()
+        possibles.update(locals())
+        method = possibles.get(func_name)
+        if callable(method):
+            print_search = re.search('print',self.data)
+            if print_search is None:
+                return eval(str(func_name) + '()')
+            else:
+                return self.handle_print()
         else:
             return self.handle_print()
 
@@ -58,15 +67,15 @@ class ReqRes(object):
             return self.handle_math_string_exp()
 
 
-def main():
-    print (ReqRes('"Misha"').process_req())
-    print (ReqRes('2+2').process_req())
-    print (ReqRes('print "Hi, I am Hungry" ').process_req())
-    print (ReqRes('def Hi(): print("Hi, I am Misha")').process_req())
-    print (ReqRes('class Misha(object): fName = "Misha"').process_req())
-    print (ReqRes('class Misha(): fName = "Misha"').process_req().f_name)
-    print (ReqRes('def add(x,y,a,p): return x+y').handle_args())
-
-
-if __name__ == '__main__':
-    main()
+# def main():
+#     print (ReqRes('"Misha"').process_req())
+#     print (ReqRes('2+2').process_req())
+#     print (ReqRes('print "Hi, I am Hungry" ').process_req())
+#     print (ReqRes('def Hi(): print("Hi, I am Misha")').process_req())
+#     print (ReqRes('class Misha(object): fName = "Misha"').process_req())
+#     print (ReqRes('class Misha(): fName = "Misha"').process_req().f_name)
+#     print (ReqRes('def add(x,y,a,p): return x+y').handle_args())
+#
+#
+# if __name__ == '__main__':
+#     main()
