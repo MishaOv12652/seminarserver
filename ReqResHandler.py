@@ -60,9 +60,9 @@ class ReqRes(object):
         meth_dict = self.handle_class_inner_func(str(self.data)[colons.end():])
         class_dict = atrr_dict.copy()
         class_dict.update(meth_dict)
-        dyn_class = type(class_name, (object,), class_dict)
+        class_name = type(class_name, (object,), class_dict)
         globals().update(locals())
-        clas = globals().get('dyn_class')
+        clas = globals().get('class_name')
         return clas
 
     def handle_class_inner_attr(self, min_str):
