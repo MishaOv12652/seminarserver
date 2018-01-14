@@ -51,23 +51,48 @@ class ReqRes(object):
                 return self.handle_print()
 
     def handle_class(self):
+        pass_exp = re.search("pass", self.data)
+        def_exp = re.search("def", self.data)
         class_word_remove = re.search("class", str(self.data))
         colons = re.search(":", str(self.data))
         class_name = self.data[class_word_remove.end() + 1:colons.start() - 2]
+        atrr_dict = self.handle_class_inner_attr(str(self.data)[colons.end():])
+        meth_dict = self.handle_class_inner_func(str(self.data)[colons.end():])
+        class_dict = atrr_dict.copy()
+        class_dict.update(meth_dict)
+        dyn_class = type(class_name, (object,), class_dict)
         globals().update(locals())
-        clas = globals().get(class_name)
-        dynamic_class = type(class_name, (), {"f_name": "Misha"})
-        return dynamic_class
+        clas = globals().get('dyn_class')
+        return clas
 
-    def handle_class_inner_attr(self):
-        return "m"
+    def handle_class_inner_attr(self, min_str):
+        atrr_dict = {}
+        def_exp = re.search("def", min_str)
+        if def_exp is not None:
+            min_str = min_str[:def_exp.start()]
+        for atr in min_str.split():
+            if re.search("def", atr) is None:
+                atrr_dict.update({atr.split('=')[0]: atr.split('=')[1]})
+        return atrr_dict
 
-    def handle_class_inner_func(self):
-        return "m"
+    def handle_class_inner_func(self, min_str):
+        func_dict = {}
+        def_exp = re.search("def", min_str)
+        if def_exp is not None:
+            min_str = min_str[def_exp.start():]
+            for atr in min_str.split("def"):
+                if atr is not '':
+                    l_brackets = re.search("\(", atr)
+                    self.data = "def" + str(atr)
+                    exec self.data
+                    func_name = atr[1:l_brackets.start()]
+                    globals().update(locals())
+                    meth_name = globals().get(func_name).__name__
+                    func_dict.update({func_name: meth_name})
+            return func_dict
 
     def process_req(self):
         poss = globals().copy()
-
         if re.search("class", str(self.data)) is not None or isinstance(poss.get(str(self.data)), types.ClassType):
             return self.handle_class()
         elif re.search("def", str(self.data)) is not None or isinstance(poss.get(str(str(self.data).split('(')[0])),
@@ -78,15 +103,21 @@ class ReqRes(object):
         else:
             return self.handle_math_string_exp()
 
-# def main():
-#     print (ReqRes('"Misha"').process_req())
-#     print (ReqRes('2+2').process_req())
-#     print (ReqRes('print "Hi, I am Hungry" ').process_req())
-#     print (ReqRes('def Hi(): print("Hi, I am Misha")').process_req())
-#     print (ReqRes('class Misha(object): fName = "Misha"').process_req())
-#     print (ReqRes('class Misha(): fName = "Misha"').process_req().f_name)
-#     print (ReqRes('def add(x,y,a,p): return x+y').handle_args())
-#
-#
-# if __name__ == '__main__':
-#     main()
+
+def main():
+    # print (ReqRes('"Misha"').process_req())
+    # print (ReqRes('2+2').process_req())
+    # print (ReqRes('print "Hi, I am Hungry" ').process_req())
+    # print (ReqRes('def Hi(): print("Hi, I am Misha")').process_req())
+    # print (ReqRes('class Misha(object): fName = "Misha"').process_req())
+    # print (ReqRes('class Misha(): fName = "Misha"').process_req().f_name)
+    # print (ReqRes('def add(x,y,a,p): return x+y').handle_args())
+    # print(
+    #     ReqRes('').handle_class_inner_func('name="Misha" age=24 def Misha(): print "Misha" def test(): print("test")'))
+    # print  (ReqRes('').handle_class_inner_attr('name="Misha" age=24 '))
+    print(ReqRes(
+        'class Demo(): f_name="Misha" l_name="Ovodenko" def into(): print "Hi, My Name is Misha Ovodenko"').handle_class())
+
+
+if __name__ == '__main__':
+    main()
