@@ -28,9 +28,9 @@ class ReqRes(object):
         colons = re.search(":", str(self.data))
         def_exp = re.search("def", str(self.data))
         func_name = self.data[def_exp.end() + 1:colons.start()]
-        exec self.data
-        if eval(func_name) is not None:
-            return eval(func_name)
+        exec str(self.data)
+        if eval(str(func_name)) is not None:
+            return eval(str(func_name))
         else:
             return self.handle_print()
 
