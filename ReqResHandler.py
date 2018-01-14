@@ -104,20 +104,20 @@ class ReqRes(object):
             return self.handle_math_string_exp()
 
 
-def main():
-    # print (ReqRes('"Misha"').process_req())
-    # print (ReqRes('2+2').process_req())
-    # print (ReqRes('print "Hi, I am Hungry" ').process_req())
-    # print (ReqRes('def Hi(): print("Hi, I am Misha")').process_req())
-    # print (ReqRes('class Misha(object): fName = "Misha"').process_req())
-    # print (ReqRes('class Misha(): fName = "Misha"').process_req().f_name)
-    # print (ReqRes('def add(x,y,a,p): return x+y').handle_args())
-    # print(
-    #     ReqRes('').handle_class_inner_func('name="Misha" age=24 def Misha(): print "Misha" def test(): print("test")'))
-    # print  (ReqRes('').handle_class_inner_attr('name="Misha" age=24 '))
-    print(ReqRes(
-        'class Demo(): f_name="Misha" l_name="Ovodenko" def into(): print "Hi, My Name is Misha Ovodenko"').handle_class())
-
-
-if __name__ == '__main__':
-    main()
+# def main():
+#     print (ReqRes('"Misha"').process_req())
+#     print (ReqRes('2+2').process_req())
+#     print (ReqRes('print "Hi, I am Hungry" ').process_req())
+#     print (ReqRes('def Hi(): print("Hi, I am Misha")').process_req())
+#     print (ReqRes('class Misha(object): fName = "Misha"').process_req())
+#     print (ReqRes('class Misha(): fName = "Misha"').process_req().f_name)
+#     print (ReqRes('def add(x,y,a,p): return x+y').handle_args())
+#     print(
+#         ReqRes('').handle_class_inner_func('name="Misha" age=24 def Misha(): print "Misha" def test(): print("test")'))
+#     print  (ReqRes('').handle_class_inner_attr('name="Misha" age=24 '))
+#     print(ReqRes(
+#         'class Demo(): f_name="Misha" l_name="Ovodenko" def into(): print "Hi, My Name is Misha Ovodenko"').handle_class())
+#
+#
+# if __name__ == '__main__':
+#     main()
