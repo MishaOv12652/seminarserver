@@ -6,7 +6,7 @@ import cPickle
 
 
 class ThreadedServer(object):
-    t_lock = threading.Lock()
+    # t_lock = threading.Lock()
 
     def __init__(self, host, port):
         self.host = host
@@ -19,24 +19,27 @@ class ThreadedServer(object):
         self.sock.listen(10)
         print('Server started on port 5200....')
         print('Waiting For Clients.........')
+        enc_dec_obj = EncDycrpt.EncDec()
+        enc_dec_obj.create_private_public_key()
         while True:
             client, address = self.sock.accept()
-            # client.settimeout(60)
-            # enc_dec_obj = EncDycrpt.EncDec()
-            # enc_dec_obj.create_private_public_key()
-            # pub_key_to_client = enc_dec_obj.priv_pub_keys_dict['bin_pub_key']
-            threading.Thread(target=self.listen_to_client, args=(client, address)).start()
+            threading.Thread(target=self.listen_to_client, args=(client, address, enc_dec_obj)).start()
 
-    def listen_to_client(self, client, address):
-        print("Client Connected......")
-        size = 1024
+    def listen_to_client(self, client, address, enc_dec_obj):
+        print("Client with the data: " + str(address) + " Connected......")
+        while True:
+            key_to_send = cPickle.dumps(enc_dec_obj.priv_pub_keys_dict['bin_pub_key'])
+            client.send(key_to_send)
+            break
+        size = 2048
         while True:
             try:
                 # self.t_lock.acquire()
                 data = client.recv(size)
+                data = enc_dec_obj.decrypt_data(cPickle.loads(data))
                 if data:
                     response = ReqResHandler.ReqRes((str(data))).process_req()
-                    client.send(str(response))
+                    client.send(cPickle.dumps(enc_dec_obj.encrypt_data(response)))
                     # self.t_lock.release()
                 else:
                     # self.t_lock.acquire()
