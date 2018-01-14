@@ -1,6 +1,5 @@
 import re
-import sys
-from StringIO import StringIO
+import types
 
 
 class ReqRes(object):
@@ -28,25 +27,39 @@ class ReqRes(object):
     def handle_function(self):
         colons = re.search(":", str(self.data))
         def_exp = re.search("def", str(self.data))
-        num_of_args = self.handle_num_args()
-        func_name = self.data[def_exp.end() + 1:colons.start() - num_of_args - 1]
-        exec self.data
-        possibles = globals().copy()
-        possibles.update(locals())
-        method = possibles.get(func_name)
-        if callable(method):
-            print_search = re.search('print',self.data)
-            if print_search is None:
-                return eval(str(func_name) + '()')
+        if def_exp is None:
+            return eval(str(self.data))
+        else:
+            num_of_args = self.handle_num_args()
+            if num_of_args > 1:
+                func_name = self.data[def_exp.end() + 1:colons.start() - (2 * num_of_args + 1)]
+            else:
+                func_name = self.data[def_exp.end() + 1:colons.start() - num_of_args - 1]
+            exec self.data
+            possibles = globals().copy()
+            possibles.update(locals())
+            globals().update(locals())
+            method = possibles.get(func_name)
+            if callable(method):
+                print_search = re.search('print', self.data)
+                if print_search is None:
+                    if num_of_args > 1:
+                        return "This Function Has Arguments Please Call The Function"
+                    else:
+                        return eval(str(func_name) + '()')
+                else:
+                    return self.handle_print()
             else:
                 return self.handle_print()
-        else:
-            return self.handle_print()
 
     def handle_class(self):
         class_word_remove = re.search("class", str(self.data))
         colons = re.search(":", str(self.data))
-        class_name = self.data[class_word_remove.end() + 1:colons.start()]
+        class_name = self.data[class_word_remove.end() + 1:colons.start() - 2]
+        possibles = globals().copy()
+        possibles.update(locals())
+        globals().update(locals())
+        clas = possibles.get(class_name)
         dynamic_class = type(class_name, (), {"f_name": "Misha"})
         return dynamic_class
 
@@ -57,15 +70,17 @@ class ReqRes(object):
         return "m"
 
     def process_req(self):
-        if re.search("class", str(self.data)) is not None:
+        poss = globals().copy()
+
+        if re.search("class", str(self.data)) is not None or isinstance(poss.get(str(self.data)), types.ClassType):
             return self.handle_class()
-        elif re.search("def", str(self.data)) is not None:
+        elif re.search("def", str(self.data)) is not None or isinstance(poss.get(str(str(self.data).split('(')[0])),
+                                                                        types.FunctionType):
             return self.handle_function()
         elif re.search("print", str(self.data)) is not None:
             return self.handle_print()
         else:
             return self.handle_math_string_exp()
-
 
 # def main():
 #     print (ReqRes('"Misha"').process_req())
