@@ -1,6 +1,7 @@
 import socket
 import cPickle
 from Crypto.PublicKey import RSA
+import ast
 
 def main():
     host = '127.0.0.1'
@@ -21,7 +22,9 @@ def main():
             line = cPickle.dumps(pub_key.encrypt(line, 32))
             mySocket.send(line)
             data = mySocket.recv(1024)
-            data = cPickle.loads(pub_key.decrypt(data))
+            p_key_file = open('p_key.pem', "r")
+            p_key = RSA.importKey(p_key_file.read())
+            data = cPickle.loads(p_key.decrypt(ast.literal_eval(str(data))))
             print ('Received from server: ' + str(data))
             line = fp.readline()
             cnt += 1
