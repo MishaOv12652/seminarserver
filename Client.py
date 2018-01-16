@@ -21,10 +21,11 @@ def main():
             print("Line {}: {}".format(cnt, line.strip()))
             line = cPickle.dumps(pub_key.encrypt(line, 32))
             mySocket.send(line)
-            data = mySocket.recv(1024)
+            data = mySocket.recv(2048)
+            data = cPickle.loads(str(data))
             p_key_file = open('p_key.pem', "r")
             p_key = RSA.importKey(p_key_file.read())
-            data = cPickle.loads(p_key.decrypt(ast.literal_eval(str(data))))
+            data = p_key.decrypt(ast.literal_eval(str(data)))
             print ('Received from server: ' + str(data))
             line = fp.readline()
             cnt += 1
