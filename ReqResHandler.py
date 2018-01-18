@@ -42,7 +42,7 @@ class ReqRes(object):
                 print_search = re.search('print', self.data)
                 if print_search is None:
                     if num_of_args > 1:
-                        return "This Function Has Arguments Please Call The Function"
+                        return "This Function Has Arguments Please Call The Function " + str(method.__name__)
                     else:
                         return eval(str(func_name) + '()')
                 else:

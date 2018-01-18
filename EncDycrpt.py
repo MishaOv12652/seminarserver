@@ -9,8 +9,12 @@ class EncDec(object):
         self.priv_pub_keys_dict = {}
 
     def create_private_public_key(self):
-        bin_priv_key = self.key.exportKey('DER')
-        bin_pub_key = self.key.publickey().exportKey('DER')
+        bin_priv_key = self.key.exportKey('PEM')
+        file_name = "p_key.pem"
+        file_to_write = open(file_name,'w')
+        file_to_write.write(bin_priv_key)
+        file_to_write.close()
+        bin_pub_key = self.key.publickey().exportKey('PEM')
         self.priv_pub_keys_dict.update({"bin_priv_key": bin_priv_key})
         self.priv_pub_keys_dict.update({"bin_pub_key": bin_pub_key})
 
