@@ -6,7 +6,6 @@ import cPickle
 
 
 class ThreadedServer(object):
-    # t_lock = threading.Lock()
 
     def __init__(self, host, port):
         self.host = host
@@ -35,22 +34,18 @@ class ThreadedServer(object):
         size = 2048
         while True:
             try:
-                # self.t_lock.acquire()
                 data = client.recv(size)
                 data = enc_dec_obj.decrypt_data(cPickle.loads(data))
                 if data:
                     response = ReqResHandler.ReqRes((str(data))).process_req(sand_box)
                     self.sand_box.update(sand_box)
                     client.send(cPickle.dumps(enc_dec_obj.encrypt_data(response)))
-                    # self.t_lock.release()
                 else:
-                    # self.t_lock.acquire()
                     raise StandardError('Client disconnected')
 
             except StandardError:
-                # self.t_lock.acquire()
                 client.close()
-                # return False
+                return False
 
 
 if __name__ == "__main__":
