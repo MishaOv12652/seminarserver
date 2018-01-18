@@ -7,11 +7,11 @@ class ReqRes(object):
     def __init__(self, data):
         self.data = data
 
-    def handle_math_string_exp(self):
+    def handle_math_string_exp(self, sand_box):
         result = eval(str(self.data))
         return str(result)
 
-    def handle_print(self):
+    def handle_print(self, sand_box):
         print_exp = re.search("print", str(self.data))
         return self.data[:print_exp.start()] + self.data[print_exp.end():]
 
@@ -24,20 +24,20 @@ class ReqRes(object):
             args.append(x.strip)
         return len(args)
 
-    def handle_function(self):
+    def handle_function(self, sand_box):
         colons = re.search(":", str(self.data))
         def_exp = re.search("def", str(self.data))
         if def_exp is None:
-            return eval(str(self.data))
+            return eval(compile(self.data, '<string>', 'eval'), sand_box)
         else:
             num_of_args = self.handle_num_args()
             if num_of_args > 1:
                 func_name = self.data[def_exp.end() + 1:colons.start() - (2 * num_of_args + 1)]
             else:
                 func_name = self.data[def_exp.end() + 1:colons.start() - num_of_args - 1]
-            exec self.data
-            globals().update(locals())
-            method = globals().get(func_name)
+            eval(compile(self.data, '<string>', 'exec'), sand_box)  # exec self.data
+            sand_box.update(locals())
+            method = sand_box[str(func_name)]
             if callable(method):
                 print_search = re.search('print', self.data)
                 if print_search is None:
@@ -50,7 +50,7 @@ class ReqRes(object):
             else:
                 return self.handle_print()
 
-    def handle_class(self):
+    def handle_class(self, sand_box):
         pass_exp = re.search("pass", self.data)
         def_exp = re.search("def", self.data)
         class_word_remove = re.search("class", str(self.data))
@@ -91,18 +91,17 @@ class ReqRes(object):
                     func_dict.update({func_name: meth_name})
             return func_dict
 
-    def process_req(self):
-        poss = globals().copy()
-        if re.search("class", str(self.data)) is not None or isinstance(poss.get(str(self.data)), types.ClassType):
-            return self.handle_class()
-        elif re.search("def", str(self.data)) is not None or isinstance(poss.get(str(str(self.data).split('(')[0])),
+    def process_req(self, sand_box):
+        # poss = globals().copy()
+        if re.search("class", str(self.data)) is not None or isinstance(sand_box.get(str(self.data)), types.ClassType):
+            return self.handle_class(sand_box)
+        elif re.search("def", str(self.data)) is not None or isinstance(sand_box.get(str(str(self.data).split('(')[0])),
                                                                         types.FunctionType):
-            return self.handle_function()
+            return self.handle_function(sand_box)
         elif re.search("print", str(self.data)) is not None:
-            return self.handle_print()
+            return self.handle_print(sand_box)
         else:
-            return self.handle_math_string_exp()
-
+            return self.handle_math_string_exp(sand_box)
 
 # def main():
 #     print (ReqRes('"Misha"').process_req())

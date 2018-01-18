@@ -14,6 +14,7 @@ class ThreadedServer(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
+        self.sand_box = {}
 
     def listen(self):
         self.sock.listen(10)
@@ -23,9 +24,9 @@ class ThreadedServer(object):
         enc_dec_obj.create_private_public_key()
         while True:
             client, address = self.sock.accept()
-            threading.Thread(target=self.listen_to_client, args=(client, address, enc_dec_obj)).start()
+            threading.Thread(target=self.listen_to_client, args=(client, address, enc_dec_obj, self.sand_box)).start()
 
-    def listen_to_client(self, client, address, enc_dec_obj):
+    def listen_to_client(self, client, address, enc_dec_obj, sand_box):
         print("Client with the data: " + str(address) + " Connected......")
         while True:
             key_to_send = cPickle.dumps(enc_dec_obj.priv_pub_keys_dict['bin_pub_key'])
@@ -38,7 +39,8 @@ class ThreadedServer(object):
                 data = client.recv(size)
                 data = enc_dec_obj.decrypt_data(cPickle.loads(data))
                 if data:
-                    response = ReqResHandler.ReqRes((str(data))).process_req()
+                    response = ReqResHandler.ReqRes((str(data))).process_req(sand_box)
+                    self.sand_box.update(sand_box)
                     client.send(cPickle.dumps(enc_dec_obj.encrypt_data(response)))
                     # self.t_lock.release()
                 else:
