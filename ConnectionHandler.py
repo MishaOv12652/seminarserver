@@ -14,7 +14,7 @@ class ThreadedServer(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
-        self.sand_box = {}
+        self.sand_box = {'__builtins__': {}}
 
     def listen(self):
         self.sock.listen(10)
