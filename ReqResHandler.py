@@ -13,7 +13,10 @@ class ReqRes(object):
 
     def handle_print(self, sand_box):
         print_exp = re.search("print", str(self.data))
-        return self.data[:print_exp.start()] + self.data[print_exp.end():]
+        if self.data[:print_exp.start()] is "":
+            return self.data[:print_exp.start()] + self.data[print_exp.end()]
+        else:
+            return self.data[print_exp.end():]
 
     def handle_num_args(self):
         l_bracket = re.search('\(', str(self.data))
@@ -35,35 +38,34 @@ class ReqRes(object):
                 func_name = self.data[def_exp.end() + 1:colons.start() - (2 * num_of_args + 1)]
             else:
                 func_name = self.data[def_exp.end() + 1:colons.start() - num_of_args - 1]
-            eval(compile(self.data, '<string>', 'exec'), sand_box)  # exec self.data
-            sand_box.update(locals())
-            method = sand_box[str(func_name)]
-            if callable(method):
+            exec self.data in sand_box
+            # eval(compile(self.data, '<str>', 'exec'), sand_box)  # exec self.data
+            if callable(sand_box[func_name]):
                 print_search = re.search('print', self.data)
                 if print_search is None:
                     if num_of_args > 1:
-                        return "This Function Has Arguments Please Call The Function " + str(method.__name__)
+                        return "This Function Has Arguments Please Call The Function " + str(
+                            sand_box[func_name].__name__)
                     else:
-                        return eval(str(func_name) + '()')
+                        return sand_box[func_name]()
                 else:
-                    return self.handle_print()
+                    return self.handle_print(sand_box)
             else:
-                return self.handle_print()
+                return self.handle_print(sand_box)
 
     def handle_class(self, sand_box):
-        pass_exp = re.search("pass", self.data)
-        def_exp = re.search("def", self.data)
+        # pass_exp = re.search("pass", self.data)
+        # def_exp = re.search("def", self.data)
         class_word_remove = re.search("class", str(self.data))
         colons = re.search(":", str(self.data))
         class_name = self.data[class_word_remove.end() + 1:colons.start() - 2]
         atrr_dict = self.handle_class_inner_attr(str(self.data)[colons.end():])
-        meth_dict = self.handle_class_inner_func(str(self.data)[colons.end():])
+        meth_dict = self.handle_class_inner_func(str(self.data)[colons.end():], sand_box)
         class_dict = atrr_dict.copy()
         class_dict.update(meth_dict)
-        class_name = type(class_name, (object,), class_dict)
-        globals().update(locals())
-        clas = globals().get('class_name')
-        return clas
+        dyn_class = type(class_name, (object,), class_dict)
+        sand_box[class_name] = dyn_class
+        return sand_box[class_name]
 
     def handle_class_inner_attr(self, min_str):
         atrr_dict = {}
@@ -75,7 +77,7 @@ class ReqRes(object):
                 atrr_dict.update({atr.split('=')[0]: atr.split('=')[1]})
         return atrr_dict
 
-    def handle_class_inner_func(self, min_str):
+    def handle_class_inner_func(self, min_str, sand_box):
         func_dict = {}
         def_exp = re.search("def", min_str)
         if def_exp is not None:
@@ -84,15 +86,12 @@ class ReqRes(object):
                 if atr is not '':
                     l_brackets = re.search("\(", atr)
                     self.data = "def" + str(atr)
-                    exec self.data
+                    exec self.data in sand_box
                     func_name = atr[1:l_brackets.start()]
-                    globals().update(locals())
-                    meth_name = globals().get(func_name).__name__
-                    func_dict.update({func_name: meth_name})
+                    func_dict.update({func_name: sand_box[func_name]})
             return func_dict
 
     def process_req(self, sand_box):
-        # poss = globals().copy()
         if re.search("class", str(self.data)) is not None or isinstance(sand_box.get(str(self.data)), types.ClassType):
             return self.handle_class(sand_box)
         elif re.search("def", str(self.data)) is not None or isinstance(sand_box.get(str(str(self.data).split('(')[0])),
