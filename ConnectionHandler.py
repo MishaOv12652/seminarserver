@@ -46,3 +46,15 @@ class ThreadedServer(object):
             except StandardError:
                 client.close()
                 return False
+
+
+if __name__ == "__main__":
+    while True:
+        port_num = 5200  # input("Port? ")
+        try:
+            port_num = int(port_num)
+            break
+        except ValueError:
+            pass
+
+    ThreadedServer('127.0.0.1', port_num).listen()
