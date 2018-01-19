@@ -51,7 +51,6 @@ class ReqRes(object):
             else:
                 func_name = self.data[def_exp.end() + 1:colons.start() - num_of_args - 1]
             exec self.data in sand_box
-            # eval(compile(self.data, '<str>', 'exec'), sand_box)  # exec self.data
             if callable(sand_box[func_name]):
                 print_search = re.search('print', self.data)
                 if print_search is None:
@@ -98,6 +97,8 @@ class ReqRes(object):
                 if atr is not '':
                     l_brackets = re.search("\(", atr)
                     self.data = "def" + str(atr)
+                    if re.search('\n', self.data) is not None:
+                        self.data = string.replace(self.data, '\n', '')
                     exec self.data in sand_box
                     func_name = atr[1:l_brackets.start()]
                     func_dict.update({func_name: sand_box[func_name]})
@@ -120,8 +121,7 @@ class ReqRes(object):
                 if hasattr(sand_box[self.data[:dot_sign.start()]], self.data[dot_sign.end():]):
                     return getattr(sand_box[self.data[:dot_sign.start()]], self.data[dot_sign.end():])
                 elif hasattr(sand_box[self.data[:dot_sign.start()]], self.data[dot_sign.end():left_bracket.start()]):
-                    return getattr(sand_box[self.data[:dot_sign.start()]],
-                                   self.data[dot_sign.end():left_bracket.start()])
+                    return sand_box[self.data[dot_sign.end():left_bracket.start()]]()
                 else:
                     return "The Object has No such attribute or function " + self.data[dot_sign.end():]
             else:
