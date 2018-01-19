@@ -25,10 +25,10 @@ class ReqRes(object):
 
     def handle_print(self):
         print_exp = re.search("print", str(self.data))
-        if self.data[:print_exp.start()] is "":
-            return self.data[:print_exp.start()] + self.data[print_exp.end()]
-        else:
-            return self.data[print_exp.end():]
+        # if self.data[:print_exp.start()] is "":
+        #     return self.data[:print_exp.start()] + self.data[print_exp.end()]
+        # else:
+        return self.data[print_exp.end():]
 
     def handle_num_args(self):
         l_bracket = re.search('\(', str(self.data))
@@ -105,8 +105,6 @@ class ReqRes(object):
             return func_dict
 
     def handle_class_calls(self, sand_box):
-        if re.search('\n', self.data) is not None:
-            self.data = string.replace(self.data, '\n', '')
         equal_sign = re.search('=', self.data)
         dot_sign = re.search('\.', self.data)
         left_bracket = re.search('\(', self.data)
@@ -128,6 +126,8 @@ class ReqRes(object):
                 return "illegal expression"
 
     def process_req(self, sand_box):
+        if re.search('\n', self.data) is not None:
+            self.data = string.replace(self.data, '\n', '')
         if re.search('import', self.data) is not None:
             return "you are trying to import a module, access is denied!"
         elif re.search("class", str(self.data)) is not None or isinstance(sand_box.get(str(self.data)),
@@ -138,7 +138,7 @@ class ReqRes(object):
             return self.handle_function(sand_box)
         elif re.search("print", str(self.data)) is not None:
             return self.handle_print()
-        elif re.search('=', self.data) is not None or re.search('.', self.data) is not None:
+        elif re.search('=', self.data) is not None or re.search('\.', self.data) is not None:
             return self.handle_class_calls(sand_box)
         else:
             return self.handle_math_string_exp(sand_box)

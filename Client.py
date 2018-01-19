@@ -13,7 +13,7 @@ def main():
         key = cPickle.loads(data)
         pub_key = RSA.importKey(key)
         break
-    filepath = './cla.txt'#'./functions.txt'#'./cla.txt'  # './misha'
+    filepath = './test.txt'#'./cla.txt'#'./functions.txt'#'./cla.txt'  # './misha'
     with open(filepath) as fp:
         line = fp.readline()
         cnt = 1
