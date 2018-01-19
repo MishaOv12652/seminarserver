@@ -11,7 +11,7 @@ class EncDec(object):
     def create_private_public_key(self):
         bin_priv_key = self.key.exportKey('PEM')
         file_name = "p_key.pem"
-        file_to_write = open(file_name,'w')
+        file_to_write = open(file_name, 'w')
         file_to_write.write(bin_priv_key)
         file_to_write.close()
         bin_pub_key = self.key.publickey().exportKey('PEM')
@@ -27,18 +27,3 @@ class EncDec(object):
         private_key = RSA.importKey(self.priv_pub_keys_dict["bin_priv_key"])
         decrypted_msg = private_key.decrypt(ast.literal_eval(str(data_to_decrypt)))
         return decrypted_msg
-
-
-def main():
-    enc_dec_obj = EncDec()
-    enc_dec_obj.create_private_public_key()
-    data_to_encrypt = 'def Misha(): print "misha"'
-    encrypted_data = enc_dec_obj.encrypt_data(data_to_encrypt)
-
-    print ("data before encryption is :" + str(data_to_encrypt))
-    print ("data after encryption is: " + str(encrypted_data))
-    print ("data after decryption is: " + enc_dec_obj.decrypt_data(encrypted_data))
-
-
-if __name__ == '__main__':
-    main()

@@ -9,7 +9,7 @@ class ReqRes(object):
         self.data = data
 
     def handle_math_string_exp(self, sand_box):
-        result = eval(str(self.data))
+        result = eval(str(self.data), sand_box)
         return str(result)
 
     def handle_print(self):
@@ -131,20 +131,3 @@ class ReqRes(object):
             return self.handle_class_calls(sand_box)
         else:
             return self.handle_math_string_exp(sand_box)
-
-# def main():
-# print (ReqRes('"Misha"').process_req())
-# print (ReqRes('2+2').process_req())
-# print (ReqRes('print "Hi, I am Hungry" ').process_req())
-# print (ReqRes('def Hi(): print("Hi, I am Misha")').process_req())
-# print (ReqRes('class Misha(object): fName = "Misha"').process_req())
-# print (ReqRes('class Misha(): fName = "Misha"').process_req().f_name)
-# print (ReqRes('def add(x,y,a,p): return x+y').handle_args())
-#     print(ReqRes(
-#         'class Demo(): f_name="Misha" l_name="Ovodenko" def into(): print "Hi, My Name is Misha Ovodenko"').handle_class(
-#         sand_box={'__builtins__': None}))
-#     print()
-#
-#
-# if __name__ == '__main__':
-#     main()

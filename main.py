@@ -3,7 +3,7 @@ import ConnectionHandler
 
 def main():
     while True:
-        port_num = input("Port? ")
+        port_num = 5200 #input("Port? ")
         try:
             port_num = int(port_num)
             break
