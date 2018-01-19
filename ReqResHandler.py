@@ -1,5 +1,6 @@
 import re
 import types
+import string
 
 
 class ReqRes(object):
@@ -11,7 +12,7 @@ class ReqRes(object):
         result = eval(str(self.data))
         return str(result)
 
-    def handle_print(self, sand_box):
+    def handle_print(self):
         print_exp = re.search("print", str(self.data))
         if self.data[:print_exp.start()] is "":
             return self.data[:print_exp.start()] + self.data[print_exp.end()]
@@ -49,13 +50,11 @@ class ReqRes(object):
                     else:
                         return sand_box[func_name]()
                 else:
-                    return self.handle_print(sand_box)
+                    return self.handle_print()
             else:
-                return self.handle_print(sand_box)
+                return self.handle_print()
 
     def handle_class(self, sand_box):
-        # pass_exp = re.search("pass", self.data)
-        # def_exp = re.search("def", self.data)
         class_word_remove = re.search("class", str(self.data))
         colons = re.search(":", str(self.data))
         class_name = self.data[class_word_remove.end() + 1:colons.start() - 2]
@@ -65,6 +64,8 @@ class ReqRes(object):
         class_dict.update(meth_dict)
         dyn_class = type(class_name, (object,), class_dict)
         sand_box[class_name] = dyn_class
+        globals()[class_name] = None
+        locals()[class_name] = None
         return sand_box[class_name]
 
     def handle_class_inner_attr(self, min_str):
@@ -91,30 +92,58 @@ class ReqRes(object):
                     func_dict.update({func_name: sand_box[func_name]})
             return func_dict
 
+    def handle_class_calls(self, sand_box):
+        if re.search('\n', self.data) is not None:
+            self.data = string.replace(self.data, '\n', '')
+        equal_sign = re.search('=', self.data)
+        dot_sign = re.search('\.', self.data)
+        left_bracket = re.search('\(', self.data)
+        if equal_sign is not None:
+            if self.data[equal_sign.end() + 1:left_bracket.start()] in sand_box.keys():
+                exec self.data in sand_box
+                return sand_box[self.data[:equal_sign.start() - 1]]
+            else:
+                return "illegal expression"
+        elif dot_sign is not None:
+            if self.data[:dot_sign.start()] in sand_box.keys():
+                if hasattr(sand_box[self.data[:dot_sign.start()]], self.data[dot_sign.end():]):
+                    return getattr(sand_box[self.data[:dot_sign.start()]], self.data[dot_sign.end():])
+                elif hasattr(sand_box[self.data[:dot_sign.start()]], self.data[dot_sign.end():left_bracket.start()]):
+                    return getattr(sand_box[self.data[:dot_sign.start()]],
+                                   self.data[dot_sign.end():left_bracket.start()])
+                else:
+                    return "The Object has No such attribute " + self.data[dot_sign.end():]
+            else:
+                return "illegal expression"
+
     def process_req(self, sand_box):
-        if re.search("class", str(self.data)) is not None or isinstance(sand_box.get(str(self.data)), types.ClassType):
+        if re.search('import', self.data) is not None:
+            return "you are trying to import a module, access is denied!"
+        elif re.search("class", str(self.data)) is not None or isinstance(sand_box.get(str(self.data)),
+                                                                          types.ClassType):
             return self.handle_class(sand_box)
         elif re.search("def", str(self.data)) is not None or isinstance(sand_box.get(str(str(self.data).split('(')[0])),
                                                                         types.FunctionType):
             return self.handle_function(sand_box)
         elif re.search("print", str(self.data)) is not None:
-            return self.handle_print(sand_box)
+            return self.handle_print()
+        elif re.search('=', self.data) is not None or re.search('.', self.data) is not None:
+            return self.handle_class_calls(sand_box)
         else:
             return self.handle_math_string_exp(sand_box)
 
 # def main():
-#     print (ReqRes('"Misha"').process_req())
-#     print (ReqRes('2+2').process_req())
-#     print (ReqRes('print "Hi, I am Hungry" ').process_req())
-#     print (ReqRes('def Hi(): print("Hi, I am Misha")').process_req())
-#     print (ReqRes('class Misha(object): fName = "Misha"').process_req())
-#     print (ReqRes('class Misha(): fName = "Misha"').process_req().f_name)
-#     print (ReqRes('def add(x,y,a,p): return x+y').handle_args())
-#     print(
-#         ReqRes('').handle_class_inner_func('name="Misha" age=24 def Misha(): print "Misha" def test(): print("test")'))
-#     print  (ReqRes('').handle_class_inner_attr('name="Misha" age=24 '))
+# print (ReqRes('"Misha"').process_req())
+# print (ReqRes('2+2').process_req())
+# print (ReqRes('print "Hi, I am Hungry" ').process_req())
+# print (ReqRes('def Hi(): print("Hi, I am Misha")').process_req())
+# print (ReqRes('class Misha(object): fName = "Misha"').process_req())
+# print (ReqRes('class Misha(): fName = "Misha"').process_req().f_name)
+# print (ReqRes('def add(x,y,a,p): return x+y').handle_args())
 #     print(ReqRes(
-#         'class Demo(): f_name="Misha" l_name="Ovodenko" def into(): print "Hi, My Name is Misha Ovodenko"').handle_class())
+#         'class Demo(): f_name="Misha" l_name="Ovodenko" def into(): print "Hi, My Name is Misha Ovodenko"').handle_class(
+#         sand_box={'__builtins__': None}))
+#     print()
 #
 #
 # if __name__ == '__main__':
