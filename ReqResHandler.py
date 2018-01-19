@@ -9,6 +9,17 @@ class ReqRes(object):
         self.data = data
 
     def handle_math_string_exp(self, sand_box):
+        banned_commands = {
+            'exec': 'exec',
+            'eval': 'eval',
+            'import': 'import',
+        }
+        for key, value in banned_commands.iteritems():
+            if re.search(value, self.data) is not None:
+                return 'you tried to use a banned command ' + str(value)
+        if re.search('type', self.data) is not None:
+            if self.handle_num_args() > 1:
+                return 'you are trying to use type method to create a class dynamically, this is not allowed!'
         result = eval(str(self.data), sand_box)
         return str(result)
 
@@ -112,7 +123,7 @@ class ReqRes(object):
                     return getattr(sand_box[self.data[:dot_sign.start()]],
                                    self.data[dot_sign.end():left_bracket.start()])
                 else:
-                    return "The Object has No such attribute " + self.data[dot_sign.end():]
+                    return "The Object has No such attribute or function " + self.data[dot_sign.end():]
             else:
                 return "illegal expression"
 
