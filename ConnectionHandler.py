@@ -28,18 +28,19 @@ class ThreadedServer(object):
     def listen_to_client(self, client, address, enc_dec_obj, sand_box):
         print("Client with the data: " + str(address) + " Connected......")
         while True:
-            key_to_send = cPickle.dumps(enc_dec_obj.priv_pub_keys_dict['bin_pub_key'])
+            key_to_send = enc_dec_obj.priv_pub_keys_dict['bin_pub_key']
             client.send(key_to_send)
             break
         size = 2048
         while True:
             try:
                 data = client.recv(size)
-                data = enc_dec_obj.decrypt_data(cPickle.loads(data))
+                #data = enc_dec_obj.decrypt_data(cPickle.loads(data))
                 if data:
                     response = ReqResHandler.ReqRes((str(data))).process_req(sand_box)
                     self.sand_box.update(sand_box)
-                    client.send(cPickle.dumps(enc_dec_obj.encrypt_data(response)))
+                    #client.send(enc_dec_obj.encrypt_data(response))
+                    client.send(str(response))
                 else:
                     raise StandardError('Client disconnected')
 
