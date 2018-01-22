@@ -26,21 +26,27 @@ class ThreadedServer(object):
             threading.Thread(target=self.listen_to_client, args=(client, address, enc_dec_obj, self.sand_box)).start()
 
     def listen_to_client(self, client, address, enc_dec_obj, sand_box):
+        size = 2048
         print("Client with the data: " + str(address) + " Connected......")
         while True:
             key_to_send = enc_dec_obj.priv_pub_keys_dict['bin_pub_key']
             client.send(key_to_send)
-            break
-        size = 2048
+            password = client.recv(size)
+            if str(enc_dec_obj.decrypt_data(password)) != "Mrort987":
+                client.send("you are not autherized, please try again")
+                exit(1)
+            else:
+                break
+
         while True:
             try:
                 data = client.recv(size)
-                #data = enc_dec_obj.decrypt_data(cPickle.loads(data))
+                data = enc_dec_obj.decrypt_data(data)
                 if data:
                     response = ReqResHandler.ReqRes((str(data))).process_req(sand_box)
                     self.sand_box.update(sand_box)
-                    #client.send(enc_dec_obj.encrypt_data(response))
-                    client.send(str(response))
+                    client.send(str(enc_dec_obj.encrypt_data(response)))
+                    #client.send(str(response))
                 else:
                     raise StandardError('Client disconnected')
 
