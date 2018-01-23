@@ -1,4 +1,5 @@
 from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
 import ast
 
 
@@ -25,5 +26,7 @@ class EncDec(object):
 
     def decrypt_data(self, data_to_decrypt):
         private_key = RSA.importKey(self.priv_pub_keys_dict["bin_priv_key"])
-        decrypted_msg = private_key.decrypt(ast.literal_eval(str(data_to_decrypt)))
+        cipher = PKCS1_OAEP.new(private_key)
+        decrypted_msg = cipher.decrypt(data_to_decrypt)
+        #decrypted_msg = private_key.decrypt(data_to_decrypt)
         return decrypted_msg

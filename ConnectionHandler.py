@@ -32,7 +32,8 @@ class ThreadedServer(object):
             key_to_send = enc_dec_obj.priv_pub_keys_dict['bin_pub_key']
             client.send(key_to_send)
             password = client.recv(size)
-            if str(enc_dec_obj.decrypt_data(password)) != "Mrort987":
+            #print(str(enc_dec_obj.decrypt_data(password)))
+            if enc_dec_obj.decrypt_data(password) != "Mrort987":
                 client.send("you are not autherized, please try again")
                 client.close()
                 return False
