@@ -34,7 +34,8 @@ class ThreadedServer(object):
             password = client.recv(size)
             if str(enc_dec_obj.decrypt_data(password)) != "Mrort987":
                 client.send("you are not autherized, please try again")
-                exit(1)
+                client.close()
+                return False
             else:
                 break
 
