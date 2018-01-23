@@ -32,12 +32,12 @@ class ThreadedServer(object):
             key_to_send = enc_dec_obj.priv_pub_keys_dict['bin_pub_key']
             client.send(key_to_send)
             password = client.recv(size)
-            #print(str(enc_dec_obj.decrypt_data(password)))
             if enc_dec_obj.decrypt_data(password) != "Mrort987":
                 client.send("you are not autherized, please try again")
                 client.close()
                 return False
             else:
+                client.send("C:\Users\Misha\PycharmProjects\Seminar\seminar\p_key.pem\n")
                 break
 
         while True:
@@ -48,7 +48,6 @@ class ThreadedServer(object):
                     response = ReqResHandler.ReqRes((str(data))).process_req(sand_box)
                     self.sand_box.update(sand_box)
                     client.send(str(enc_dec_obj.encrypt_data(response)))
-                    #client.send(str(response))
                 else:
                     raise StandardError('Client disconnected')
 
