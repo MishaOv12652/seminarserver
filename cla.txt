@@ -1,6 +1,0 @@
-import os
-class Demo(): f_name="Misha" l_name="Ovodenko" def into(): return 24
-demo = Demo()
-demo.f_name
-demo.into()
-class Misha(): f_name="Misha" l_name="Ovodenko" def into(): print "Hi, My Name is Misha Ovodenko"

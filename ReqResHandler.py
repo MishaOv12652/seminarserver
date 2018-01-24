@@ -25,9 +25,6 @@ class ReqRes(object):
 
     def handle_print(self):
         print_exp = re.search("print", str(self.data))
-        # if self.data[:print_exp.start()] is "":
-        #     return self.data[:print_exp.start()] + self.data[print_exp.end()]
-        # else:
         return self.data[print_exp.end():]
 
     def handle_num_args(self):

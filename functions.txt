@@ -1,6 +1,0 @@
-def add(x,y): return x+y
-add(1,2)
-def mult(x,y,z): return x*y*z
-mult(2,5,3)
-def infinite_loop(): i = 0 while True: i+=1
-infinite_loop()
