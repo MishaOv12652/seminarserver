@@ -118,7 +118,8 @@ class ReqRes(object):
             if self.data[:dot_sign.start()] in sand_box.keys():
                 if hasattr(sand_box[self.data[:dot_sign.start()]], self.data[dot_sign.end():]):
                     return getattr(sand_box[self.data[:dot_sign.start()]], self.data[dot_sign.end():])
-                elif hasattr(sand_box[self.data[:dot_sign.start()]], self.data[dot_sign.end():left_bracket.start()]):
+                elif left_bracket is not None and hasattr(sand_box[self.data[:dot_sign.start()]],
+                                                          self.data[dot_sign.end():left_bracket.start()]):
                     return sand_box[self.data[dot_sign.end():left_bracket.start()]]()
                 else:
                     return "The Object has No such attribute or function " + self.data[dot_sign.end():]
