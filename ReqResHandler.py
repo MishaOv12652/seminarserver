@@ -13,13 +13,14 @@ class ReqRes(object):
             'exec': 'exec',
             'eval': 'eval',
             'import': 'import',
+            'type': 'type'
         }
         for key, value in banned_commands.iteritems():
             if re.search(value, self.data) is not None:
                 return 'you tried to use a banned command ' + str(value)
-        if re.search('type', self.data) is not None:
-            if self.handle_num_args() > 1:
-                return 'you are trying to use type method to create a class dynamically, this is not allowed!'
+        # if re.search('type', self.data) is not None:
+        #     if self.handle_num_args() > 1:
+        #         return 'you are trying to use type method to create a class dynamically, this is not allowed!'
         result = eval(str(self.data), sand_box)
         return str(result)
 
@@ -106,7 +107,11 @@ class ReqRes(object):
         dot_sign = re.search('\.', self.data)
         left_bracket = re.search('\(', self.data)
         if equal_sign is not None:
-            if self.data[equal_sign.end() + 1:left_bracket.start()] in sand_box.keys():
+            if re.search('\{', self.data) is not None and re.search(
+                    '\}', self.data) is not None:
+                exec self.data in sand_box
+                return sand_box[self.data[0:equal_sign.start()]]
+            elif self.data[equal_sign.end() + 1:left_bracket.start()] in sand_box.keys():
                 exec self.data in sand_box
                 return sand_box[self.data[:equal_sign.start() - 1]]
             else:

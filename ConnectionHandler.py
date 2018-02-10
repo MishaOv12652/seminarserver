@@ -22,9 +22,10 @@ class ThreadedServer(object):
         enc_dec_obj.create_private_public_key()
         while True:
             client, address = self.sock.accept()
-            threading.Thread(target=self.listen_to_client, args=(client, address, enc_dec_obj, self.sand_box)).start()
+            threading.Thread(target=self.listen_to_client, args=(client, address, enc_dec_obj)).start()
 
-    def listen_to_client(self, client, address, enc_dec_obj, sand_box):
+    def listen_to_client(self, client, address, enc_dec_obj):
+        sand_box = {'__builtins__': {}}
         size = 2048
         print("Client with the data: " + str(address) + " Connected......")
         while True:
