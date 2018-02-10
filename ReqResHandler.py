@@ -23,8 +23,8 @@ class ReqRes(object):
         #         return 'you are trying to use type method to create a class dynamically, this is not allowed!'
         try:
             result = eval(str(self.data), sand_box)
-        except (ValueError, NameError, SyntaxError, ZeroDivisionError) as e:
-            result = str(e)
+        except (ValueError, NameError, SyntaxError, ZeroDivisionError, KeyError) as e:
+            result = 'Error:' + str(e)
         return str(result)
 
     def handle_print(self):
@@ -72,7 +72,8 @@ class ReqRes(object):
         atrr_dict = self.handle_class_inner_attr(str(self.data)[colons.end():])
         meth_dict = self.handle_class_inner_func(str(self.data)[colons.end():], sand_box)
         class_dict = atrr_dict.copy()
-        class_dict.update(meth_dict)
+        if meth_dict is not None:
+            class_dict.update(meth_dict)
         dyn_class = type(class_name, (object,), class_dict)
         sand_box[class_name] = dyn_class
         globals()[class_name] = None
@@ -81,12 +82,19 @@ class ReqRes(object):
 
     def handle_class_inner_attr(self, min_str):
         atrr_dict = {}
+        init_func = re.search('__init__', min_str)
+        if init_func is not None:
+            fin_of_init_func = re.search(':', min_str)
+            min_str = min_str[fin_of_init_func.end():]
         def_exp = re.search("def", min_str)
         if def_exp is not None:
             min_str = min_str[:def_exp.start()]
         for atr in min_str.split():
             if re.search("def", atr) is None:
-                atrr_dict.update({atr.split('=')[0]: atr.split('=')[1]})
+                if re.search('self.', atr):
+                    atrr_dict.update({atr.split('=')[0].replace('self.', ''): atr.split('=')[1]})
+                else:
+                    atrr_dict.update({atr.split('=')[0]: atr.split('=')[1]})
         return atrr_dict
 
     def handle_class_inner_func(self, min_str, sand_box):
