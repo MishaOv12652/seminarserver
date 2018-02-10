@@ -21,7 +21,10 @@ class ReqRes(object):
         # if re.search('type', self.data) is not None:
         #     if self.handle_num_args() > 1:
         #         return 'you are trying to use type method to create a class dynamically, this is not allowed!'
-        result = eval(str(self.data), sand_box)
+        try:
+            result = eval(str(self.data), sand_box)
+        except (ValueError, NameError, SyntaxError, ZeroDivisionError) as e:
+            result = str(e)
         return str(result)
 
     def handle_print(self):
