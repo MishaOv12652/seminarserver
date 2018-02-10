@@ -18,13 +18,13 @@ class ThreadedServer(object):
         self.sock.listen(10)
         print('Server started on port 5200....')
         print('Waiting For Clients.........')
-        enc_dec_obj = EncDycrpt.EncDec()
-        enc_dec_obj.create_private_public_key()
         while True:
             client, address = self.sock.accept()
-            threading.Thread(target=self.listen_to_client, args=(client, address, enc_dec_obj)).start()
+            threading.Thread(target=self.listen_to_client, args=(client, address)).start()
 
-    def listen_to_client(self, client, address, enc_dec_obj):
+    def listen_to_client(self, client, address):
+        enc_dec_obj = EncDycrpt.EncDec()
+        enc_dec_obj.create_private_public_key()
         sand_box = {'__builtins__': {}}
         size = 2048
         print("Client with the data: " + str(address) + " Connected......")
